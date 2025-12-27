@@ -11,12 +11,24 @@ async function getActiveTabUrl() {
   });
 }
 
+async function getSettings() {
+  return new Promise((resolve) => {
+    chrome.storage.sync.get(['apiUrl','apiKey'], (items) => {
+      resolve({ apiUrl: items.apiUrl || 'http://127.0.0.1:8000/check-url', apiKey: items.apiKey || '' });
+    });
+  });
+}
+
 async function checkUrl(url) {
-  const apiUrl = 'http://127.0.0.1:8000/check-url';
+  const settings = await getSettings();
+  const apiUrl = settings.apiUrl;
+  const apiKey = settings.apiKey;
   try {
+    const headers = { 'Content-Type': 'application/json' };
+    if (apiKey) headers['x-api-key'] = apiKey;
     const r = await fetch(apiUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ url })
     });
     if (!r.ok) {

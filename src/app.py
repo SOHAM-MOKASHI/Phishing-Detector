@@ -1,11 +1,13 @@
 from ast import Raise
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 from pydantic import BaseModel, HttpUrl
 from typing import Dict, Any
 import uvicorn
 from feature_extractor import URLFeatureExtractor
+# Import download helper to optionally fetch model artifacts at startup
+from scripts import download_models
 from model_trainer import PhishingModelTrainer
 import os
 
@@ -71,6 +73,12 @@ async def startup_event():
     try:
         logging.basicConfig(level=logging.DEBUG)
         logging.info("Starting up server...")
+        # Attempt to download model artifacts if environment variables are configured
+        try:
+            download_models.download_models_if_missing()
+        except Exception as e:
+            logging.warning(f"Model download attempt failed: {e}")
+
         load_latest_model()
         logging.info("Server startup complete")
     except Exception as e:
@@ -87,15 +95,21 @@ class URLCheckResponse(BaseModel):
     risk_factors: list[str]
 
 @app.post("/check-url", response_model=URLCheckResponse)
-async def check_url(request: URLCheckRequest):
+async def check_url(request_payload: URLCheckRequest, req: Request):
     try:
+        # Enforce API key if configured in environment
+        api_key_env = os.getenv('API_KEY')
+        if api_key_env:
+            client_key = req.headers.get('x-api-key') or req.headers.get('X-API-KEY')
+            if not client_key or client_key != api_key_env:
+                raise HTTPException(status_code=401, detail='Invalid or missing API key')
         # Extract features
-        features = feature_extractor.extract_features(str(request.url))
+        features = feature_extractor.extract_features(str(request_payload.url))
         if features is None:
             raise HTTPException(status_code=400, message="Could not extract features from URL")
         # Simple registered-domain helper
         from urllib.parse import urlparse
-        parsed = urlparse(str(request.url))
+        parsed = urlparse(str(request_payload.url))
         host = (parsed.hostname or parsed.netloc or '').lower()
         host_parts = host.split('.') if host else []
         reg_domain = '.'.join(host_parts[-2:]) if len(host_parts) >= 2 else host

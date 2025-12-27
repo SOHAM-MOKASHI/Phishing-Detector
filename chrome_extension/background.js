@@ -1,13 +1,22 @@
 // Background service worker: listens for checks and tab changes, queries local API,
 // sets the extension badge and forwards results to the page when applicable.
 
-const API_BASE = 'http://127.0.0.1:8000/check-url';
+async function getSettings() {
+  return new Promise((resolve) => {
+    chrome.storage.sync.get(['apiUrl','apiKey'], (items) => {
+      resolve({ apiUrl: items.apiUrl || 'http://127.0.0.1:8000/check-url', apiKey: items.apiKey || '' });
+    });
+  });
+}
 
 async function fetchCheck(url) {
   try {
-    const resp = await fetch(API_BASE, {
+    const settings = await getSettings();
+    const headers = { 'Content-Type': 'application/json' };
+    if (settings.apiKey) headers['x-api-key'] = settings.apiKey;
+    const resp = await fetch(settings.apiUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ url })
     });
     if (!resp.ok) {
