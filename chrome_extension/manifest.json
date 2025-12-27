@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Phishing Checker",
+  "version": "0.2",
+  "description": "Check the current page URL against the local Phishing Prevention API",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Phishing Checker"
+  },
+  "permissions": ["tabs", "activeTab", "storage"],
+  "host_permissions": [
+    "http://127.0.0.1:8000/*",
+    "http://localhost:8000/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content_script.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

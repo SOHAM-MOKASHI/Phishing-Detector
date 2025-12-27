@@ -1,0 +1,18 @@
+2025-10-20 23:35:49,991 INFO Starting Phishing Prevention API on http://127.0.0.1:8000
+2025-10-20 23:35:49,996 DEBUG Using proactor: IocpProactor
+2025-10-20 23:35:50,061 INFO Starting up server...
+2025-10-20 23:35:50,062 INFO Looking for models in directory: models
+2025-10-20 23:35:50,063 INFO Found model files: ['phishing_model_20251020_231115.joblib']
+2025-10-20 23:35:50,064 INFO Loading model from: models\phishing_model_20251020_231115.joblib
+2025-10-20 23:35:50,065 INFO Loading scaler from: models\scaler_20251020_231115.joblib
+2025-10-20 23:35:50,096 INFO Model and scaler loaded successfully
+2025-10-20 23:35:50,097 INFO Server startup complete
+2025-10-20 23:37:21,878 INFO Starting Phishing Prevention API on http://127.0.0.1:8000
+2025-10-20 23:37:21,886 DEBUG Using proactor: IocpProactor
+2025-10-20 23:37:21,932 INFO Starting up server...
+2025-10-20 23:37:21,932 INFO Looking for models in directory: models
+2025-10-20 23:37:21,933 INFO Found model files: ['phishing_model_20251020_231115.joblib', 'phishing_model_20251020_233717.joblib']
+2025-10-20 23:37:21,934 INFO Loading model from: models\phishing_model_20251020_233717.joblib
+2025-10-20 23:37:21,934 INFO Loading scaler from: models\scaler_20251020_233717.joblib
+2025-10-20 23:37:22,006 INFO Model and scaler loaded successfully
+2025-10-20 23:37:22,006 INFO Server startup complete
